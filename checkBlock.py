@@ -1,5 +1,7 @@
+
 from bitcoin.rpc import RawProxy
 import hashlib
+import binascii
 
 p = RawProxy()
 
@@ -11,8 +13,8 @@ def toLittleEndian(input):
 
 # manually calculate hash of the block
 def getBlockHash(blockheight, p):
-    blockHash = p.getblockhash(int(blockHeight))
-    blockHeader = p.getblockheader(blockHash)
+   
+    blockHeader = p.getblockheader(p.getblockhash(int(blockheight)))
 
     hexVersion = toLittleEndian(blockHeader['versionHex'])
     previousBlockHash = toLittleEndian(blockHeader['previousblockhash'])
@@ -29,18 +31,15 @@ def getBlockHash(blockheight, p):
         nonce)
 
     headerBinary = binascii.unhexlify(headerHex)
-    calculatedHash = toLittleEndian(hashlib.sha256(hashlib.sha256(headerBinary).digest()).hexdigest())
-    if blockHash == calculatedHash:
-        return True
-    else:
-        return False
-
-blockhash = p.getblockhash(blockheight)
+    return toLittleEndian(hashlib.sha256(hashlib.sha256(headerBinary).digest()).hexdigest())
+        
 blockheight = int(raw_input('Input number of your block (just type \'no\' if you dont want to) ->'))
+blockhash = p.getblockhash(blockheight)
 print("Original hash of block nr. ", blockheight, "-> ", blockhash)
-caclulatedHash = getBlockHash(blockheight)
-print("Caclulated hash of block nr. ", blockheight, "-> ", calculatedHash)
+calculatedHash = getBlockHash(blockheight,p)
+print("Calculated hash of block nr. ", blockheight, "-> ", calculatedHash)
 if blockhash == calculatedHash:
     print("Its a match")
 else:
     print("Oh no")
+0
